@@ -1,0 +1,535 @@
+@database FAME-FTPd.guide
+@$VER: FAME-FTPd.guide V0.3 (04-24-04)
+@author "Sascha 'SieGeL' Pfalz (siegel@trsi.org)"
+@(c) "© 2003-2004 IN-Ovation Software & (tRSi-iNNOVATiONs)"
+@index Main
+@background "FAME:Documentation/images/fameback.gif"
+@wordwrap
+@node "Main" "FAME-FTPd - English documentation"
+     @{b}@{fg shine}@{s} ............................... ...............................
+     :::::::::: ...........:::::::::' `:::::::::..........  ..........
+     :::::::::: :::::::::: :::::::::: .......... :::::::::: ::::::::::
+     :::::::::: :::::::::: :::::::::: ::::::::::.:::::::::' ::::::::::@{ub}@{fg text}
+    @{b}--[@{ub} Mo! @{b}]--------.----@{ub} @{b}@{fg shine}::::::::::@{ub}@{fg text} @{b}---------------------@{ub} @{b}@{fg shine}::::::::::@{ub}@{fg text} @{b}--.@{ub}
+                     @{b}|@{ub}                  ( /F-iNNOVATiON )                @{b}|@{ub}
+                     @{b}`---------------------------------------------------'@{ub}@{us}
+
+                       @{s}iS pROUD tO pRESENT in 2004:@{us}
+
+                    @{fg shine}FTP-Server for FAME Systems V2.x@{fg text}
+
+       written & (c) by Sascha 'SieGeL' Pfalz of (tRSi-iNNOVATiONs)
+
+                          @{"-+- INTRODUCTION  -+-" link "INTRO"}
+                          @{"-+- REQUIREMENTS  -+-" link "REQUIREMENTS"}
+                          @{"-+-   FEATURES    -+-" link "FEATURES"}
+                          @{"-+- INSTALLATION  -+-" link "INSTALL"}
+                          @{"-+- CONFIGURATION -+-" link "CONFIG"}
+                          @{"-+- COMPATIBILITY -+-" link "COMP"}
+                          @{"-+-  HOW IT WORK  -+-" link "HOWITWORKS"}
+                          @{"-+-   ABOUT MUI   -+-" link "MUI"}
+                          @{"-+-   TODO LIST   -+-" link "TO-DO"}
+                          @{"-+-   GREETINGS   -+-" link "GREETS"}
+
+
+              @{"Back to the FAME Documentation Main Index" LINK FAME:Documentation/FAMEIndex.guide/Main}
+
+             FAME is © 1993-2001 by David 'Strider/tRSi' Wettig
+
+                     MUI is © 1993-99 by Stefan Stuntz
+
+                    Document last updated: 24-Apr-2004
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "INTRO" "FAME-FTPd - Introduction or why I wrote this tool."
+
+@{u}INTRODUCTION@{uu}
+
+FAME-FTPd is a very small FTP server written for FAME BBS Systems. It is
+not a FTP server in the traditional way: There is no access to the file-
+system, there is no separate user database etc. The whole server system
+is fully integrated in FAME and therefore won't work without a running
+FAME system.
+
+FAME-FTPd uses FAME V2.x features like shared structures, Semaphores
+etc. This allows a very efficient usage of your resources, as the FTP
+server interacts with FAME via shared memory structures and so there
+is no double allocations of FAME data structures. This, however,
+requires also that FAME is RUNNING if you want to use FTP. Without
+a started FAME System you won't be able to use the FTP service.
+
+If you wonder why I choose to write the server as inetd() driven
+application instead of stand-alone server...well ever tried to
+write multi-threaded programs on AmigaOS? It's a pain, you have to
+manage the whole thread control yourself, which is really too
+much work these days. Maybe AmigaOS 4.x has a working fork()
+implementation which allows to write a stand-alone server, but for now
+this works via inetd and reduces the complexity to a minimum as also
+can seen in the codesize of the server.
+
+As I have no plans to develop anymore on Classic Amiga Systems I've
+decided to release the c-sources together with this server, so if anyone
+is interested one can continue writing on this tool. 
+
+See ya all on AmigaOS 4.0 PPC powered!
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "REQUIREMENTS" "FAME-FTPd - Requirements to use FAME-FTPd"
+
+@{u}REQUIREMENTS@{uu}
+
+- AmigaOS V3.x required (Usage of Memory pools to avoid fragmentation)
+
+- FAME V2.x is required, earlier versions WON'T WORK!
+
+- MUI 3.x required for Configuration Tool
+
+- A TCP/IP stack up and running. I've developed and tested the server
+  with MiamiDX V1.0, but as I only use bsdsocket.library functions it
+  should work with all other Amiga TCP/IP stacks, too.
+
+- 68040 or better CPU required! Uploading is a cpu-consuming task, older CPU's
+  simply have not enough power for highspeed FTP :|
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "FEATURES" "FAME-FTPd - Key Features of FAME-FTPd"
+
+@{u}FEATURES@{uu}
+
+
+Key features are of course the minimal resource usage and ease of use.
+Here are some of the key features listed:
+
+ - AmigaOS 3.x only as memory pools are used. Currently requires
+   about ~10kb memory per instance plus the size of the server (22kb)
+
+ - Full native AmigaOS code, no ANSI code or other emulation layers
+   used.
+
+ - MUI driven configuration program
+
+ - Easy installation/usage, just follow the installation chapter and
+   your FTP Server should be running in a couple of minutes!
+
+ - Virtual Filesystem, no user has access to your Harddisks, everything
+   is done in memory to maximize security
+
+ - Fully RFC 959 compliant, parts of RFC 2389 (FEAT) are also implemented
+
+ - Passive Mode support with enhanced features (external IP address,
+   configurable port ranges)
+
+ - Supplied FIM Door which allows to monitor the server from FAME
+
+ - FAME user access is fully supported, no special settings required
+
+
+Features that won't go into the server:
+
+ - SSL support 
+   Reason: The current classic Amigas are really too slow to allow SSL 
+   encryption.
+   Maybe on the NG Amigas equipped with PPC cpu's this would be an option,
+   but on 68k no way!
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "COMP" "FAME-FTPd: Compatibility with other clients"
+
+@{u}COMPATIBILITY@{uu}
+
+
+@{b}a) Clients@{ub}
+
+The server was tested against many different FTP client applications,
+all working fine no matter what platform I used. I'm using the following
+clients for general function tests:
+
+AmigaOS:
+
+  MiamiFTP            -> Works fine.
+  AmFTP               -> Works fine except local usage. Anyway you should
+                         no longer use this client, it is really not RFC
+                         aware...
+  mFTP                -> Works fine.
+  DOpus 5.x FTP       -> Works fine.
+
+
+Windows XP:
+
+  DOS ftp             -> Works fine.
+  Total Commander     -> Works fine.
+  FlashFXP            -> Works fine.
+  Opera 7.11          -> works fine.
+
+
+Linux x86/PPC:
+
+  ftp command         -> Works fine.
+  ncftp               -> Works fine.
+  Midnight Commander  -> Works fine.
+  Konqueror           -> Works fine.
+  gFTP                -> Works fine but seems to forgot to close his control
+                         connections after an upload.
+  pftp                -> Works fine.
+
+If you have tested with a client not listed here please let me know so I
+can update this list.
+
+
+@{b}b) Commands@{ub}
+
+The following FTP commands are implemented:
+
+   USER     PASS     TYPE     LIST     CWD      QUIT
+   RETR     STOR     PORT     NLST     PWD      XPWD
+   MODE     PASV     SYST     NOOP     XCWD     CDUP
+   SIZE     STRU     ABOR     FEAT     CLNT     HELP
+   STAT
+
+You may issue a @{b}HELP@{ub} command when connected to see that list and you can
+also get basic help for all commands with @{b}HELP <command>@{ub}.
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "INSTALL" "FAME-FTPd: How to install the Server to your System"
+
+@{u}INSTALLATION@{uu}
+
+Copy the executable FAME-FTPd to FAME:Modules/. You may also choose
+a different location, but as all FAME support tools are placed here
+I would recommend to put the FTP Server also in this location.
+
+Copy the supplied FTPDoor.FIM to FAME:Doors or any other place you want.
+
+Copy the MUI executable FAME-FTPdCFG to a directory of your choice,
+FAME:Modules would be a nice place, too.
+
+Copy the Documentation you are currently reading to FAME:Documentation
+if you want to have online help available inside the Config Tool.
+
+Now open your inetd configuration of your TCP/IP stack and enter the
+following line to activate the server:
+
+  Service: ftp
+   Socket: stream
+ Protocol: tcp
+     Wait: nowait
+     User: root
+   Server: FAME:Modules/FAME-FTPd
+     Name: FAME-FTPd
+Arguments:
+
+No arguments are required. If you have installed the executable in
+a differenet location you have to specify of course the correct path
+as Server: config option.
+
+If you want to use the FTP server on a different port than the
+standard port 21, edit or add your port in your services entry and give
+it a useful name (i.e. FAMEFTPd), then enter this service name instead
+of 'ftp' in your inetd db.
+
+Next start the FAME SystemEditor and create a new Door Command (BBSCMD)
+called @{b}FTPWHO@{ub}. Please note that this command must be exactly
+named FTPWHO, else the door won't work, as it determines the running
+mode from the door calling name.
+
+Finally you should start first the Configuration tool and configure the
+server before trying to use it.
+
+Now see chapter @{"CONFIGURATION" LINK "CONFIG"} for all configurable options in FAME-FTPd.
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "CONFIG" "FAME-FTPd: How to configure the Server to your needs"
+
+@{u}CONFIGURATION@{uu}
+
+FAME-FTPd can be configured only via the supplied MUI tool. The following
+options can be set within the configuration tool:
+
+Page @{b}PATHES:@{ub}
+
+Login ASCII              - Enter here the full path to a textfile which
+                           should be displayed before the user enters his
+                           logindata. Useful to display a short BBS ascii
+                           or some other informations. Leave blank if you
+                           won't want such a file to be displayed.
+
+Upload Description File  - Enter here the full path to a small textfile
+                           which explains how to upload with FAME-FTPd.
+                           I highly recommend the usage of this option
+                           to avoid useless transfers. The file you are
+                           giving here will be shown in every conference
+                           the user has access to.
+                           Leaving this field blank results in actually
+                           NO file in your conferences.
+
+Temporary Upload Path    - Enter here a path where pending uploads should
+                           be placed. A good choice is RAM: (which is also
+                           the default) to avoid disc fragmentation. But
+                           remember that you require enough free space to
+                           hold all temporary uploads, so if you expect
+                           many simultanous uploads I would suggest to
+                           use a discbased temporary path instead!
+
+Use passive IP from File - If you are inside an IP-Nat'ed network and your
+                           Amiga is not connected directly to the internet
+                           but connected to an IP-Nat router/firewall passive
+                           connections from outside won't work as the Server
+                           will return it's LAN address instead of the correct
+                           IP address used on your router. To support passive
+                           anyway you have to create a textfile containing 
+                           either the hostname (bla.dyndns.org) or your real
+                           IP address to use and enter here the full
+                           filename to this file (i.e. ENV:ip).
+
+Logfile                  - Here you can specify a complete filename where the
+                           Server should write the logging file. If you leave
+                           this setting empty the server defaults to the path
+                           RAM:ftpd_debug.log for writing the log.
+
+Page @{b}OPTIONS:@{ub}
+
+Use Debug-Window         - As FAME-FTPd is currently under development it may
+                           be useful to see all logged actions immediatly on
+                           screen. To support this activate this option, as soon
+                           as someone connects to your server a console window
+                           opens and you will see all actions performed on your
+                           server. Actually the contents are a exact mirror of
+                           the debug log file. If you disable this setting the
+                           server only loggs important actions, not the whole
+                           communication between server and client.
+
+Resolve Hostnames        - If you wish to have stored hostnames instead of IP
+                           addresses activate this option. Please note however
+                           that it may take some time until the ip address is
+                           resolved, if this is a problem for you just disable
+                           this feature.
+
+Max. Filename Length     - Here you can adjust how many characters are allowed
+                           at maximum for uploaded files. Ranges from 12-107
+                           characters, but be warned that there are some doors
+                           out there which completly get mad when you use
+                           filenames above 28 characters! Defaults to 12 chars.
+
+Filecopy Buffer Size     - Specifies how many bytes should be used to move
+                           uploaded files. Ranges from 256kb - 1024kb with 512kb
+                           being the default value.
+
+Timeout in Minutes       - Specifies how long the server should wait for idle
+                           connections before dropping the connection. Ranges
+                           from 1-15 minutes with 10 minutes being the default.
+
+Passive Port range       - Here you can specify which ports should be used
+                           when a passive command is received. Normally the
+                           TCP stack itself chooses a port number which is then
+                           used inside the reply. However if your Amiga is behind
+                           a firewall you can run into trouble if the Amiga
+                           chooses a port number your firewall denies. To avoid
+                           troubles in these scenarios the server can use a
+                           specific port range for passive responses. You can
+                           enter here the start- and endvalue for the range of
+                           ports to be used, but to avoid major trouble with
+                           no free ports the config tool allows only to save
+                           the prefs when your given range is greater than
+                           500, else an error is displayed and saving is aborted.
+                           If this all does not make any sense to you (maybe
+                           you are not behind NAT/Firewall/whatever) you can
+                           simply let both numbers be defined as 0 (default)
+                           and the TCP stack will handle port allocation itself.
+
+Max Users                - Here you can enter a maximum count of simultaenous
+                           online users. If set to 0 no check is performed, the
+                           server allows every connection.
+                           If set to > 0 the server checks if this number of
+                           connections is exceeded, if this is the case all
+                           new logins are rejected with an appropiate message.
+
+
+Page @{b}TASK-MONITOR:@{ub}
+
+Here you can see all currently active connections on your server.
+This is an exact representation of the FAME-door command 'FTPWHO' but
+allows you to control the connections without being logged into FAME.
+Use @{b}R-Amiga U@{ub} to update the display.
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "HOWITWORKS" "FAME-FTPd: How it works"
+
+@{u}How the FTP Server works@{uu}
+
+When an user loggs into the FTP Server, FAME-FTPd tries to get the user data
+from FAME. If this fails, login will be denied. This means for you as sysop
+that you have to enter ALL users first in your BBS before they can actually
+use the FTP service!
+
+FAME-FTPd respects of course all user-security settings like Disabled, New
+user or upload denied etc. So all you have to do is to make sure that your
+BBS access rights are correctly defined, FAME-FTPd takes advantage of these
+settings and use them just like FAME does.
+
+After logging in the user will get a list of all conferences he has access to.
+This list is also called the "Root directory". In reality the user only sees
+a memory dump of your conference list. As long as the user has not joined
+any conference (by CWD'ing to the according directory) neither Uploading nor
+Downloading is allowed.
+
+After joining a conference the user will see the special HowToUpload.txt file
+if you have that configured. This file should be used to give new users a
+small help how to use the FAME FTPd Server.
+If the user has already uploaded some files they will be displayed, too. But
+please remember that a) the files you are viewing are "virtual" and b) the
+server is session-based, meaning that you will see only files uploaded in
+your current session. If you are logged in more than once via FTP, other
+sessions from you won't know anything from your current session.
+
+When you upload files, the following rules apply:
+
+ - Aborting the Filetransfer results in removal of the temporary file
+
+ - Resuming cannot work because of virtual filesystem, so you have
+   to upload the whole file again (sorry)
+
+ - After uploading the file will be moved to the conference LostCarrier
+   directory. It still shows up in the directory view, but it is no longer
+   accessable by you (Rename / Delete)!
+
+ - The FTP Server accounts your credits and you can finish then your upload(s)
+   by logging into FAME and enter the filedescriptions of all files prompted to
+   you by FAME.
+
+All actions an user performs inside the FTP Server will be tracked by an external
+statistics file which can be read and displayed by the FIM Door in FTPWHO mode or
+by using the MUI Config tool (page Task Monitor).
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "TO-DO" "Things that have not been implemented yet"
+
+@{u}TO-DO LIST@{uu}
+
+The following things are currently not implemented:
+
+- @{b}Online users cannot use the FTPd Server while still logged into FAME.@{ub}
+
+  This is mainly because of a major bug in FAME V2.x config system.
+  Normally the config system should handle online users transparently for
+  any FAME app, so that you can change things and the online user will be
+  changed immediatly, too.
+  However this does not work, so if you are currently logged into FAME and
+  try to connect to FTPd the FTP Server won't let you connect until you
+  first logout from FAME. Maybe I can change this behavour in future versions
+  by updating online user.data via the FAME Semaphore, if this is supported.
+  Until this has been fixed connecting to FAME AND the FTPd server at once
+  is forbidden.
+
+
+- @{b}Downloading of FAME files via FTP is not supported.@{ub}
+
+  Currently I have no idea how to make the Filelists available to the FTPd.
+  Maybe this can be handled by the additional FAME door, but this requires
+  extensively testing before I can implemented this (key problem is the
+  calculation of Bytes for users, so that they cannot download more files
+  than their current ratio allows).
+
+
+- @{b}WeekTop is not updated for files uploaded via FTPd.@{ub}
+
+  Another FAME bug hits me when I implemented the uploading. All uploaded
+  files will be put as "LostCarrier" Files to FAME, so that you only have
+  to enter the filedescriptions and the files will be posted afterwards.
+  However FAME seems to forget to execute the ULSTAT syscmd's for all
+  uploaded files.
+  When uploading these files as PartUploads FAME prompts you for every
+  file to resume (!!) the upload, which is really not the way you want
+  to use FAME...but for these files the ULSTATs commands are executed.
+  My planned workaround is to put a special file somewhere used as indicator
+  for the FAME door to execute the ULSTAT command with the correct args
+  so that FTP uploads will be counted correctly.
+
+
+- @{b}Binary uploads in ASCII mode result in FTPd does not function any more.@{ub}
+
+  If you upload a binary file in ASCII mode the FTPd gets somehow confused and
+  you have to relogin. I have to check out why this happens, for now please
+  make sure that you use the BINARY mode when transfering BINARY data :)
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "GREETS" "The well-known Greetings :)"
+
+@{u}GREETINGS@{uu}
+
+First of all I have to thank @{b}Joran Jessurun@{ub} <nl0jor@nl0jor.nl.cbpr.org> for his
+JornFTPd which inspires me to write my own Server. Parts of JornFTPd have been
+taken and modified, so: @{b}BIG THANK YOU FOR YOUR WORK@{ub} !
+
+Next is @{b}Andreas 'Bysis' Lorenz@{ub} for his help finding the TCP/IP problems
+in the early development phase of FAME-FTPd.
+
+
+@{u}Regards must also go to my Beta-Testers:@{uu}
+
+aRGON/tRSi, dIGIMAn/tRSi, eXON, Elvin
+
+Of course a big greeting goes to the whole TRSI crew, which is by far the best
+group on this planet.
+
+@endnode
+
+@REM *******************************************************************************
+
+@node "MUI" "About the MUI-System"
+
+                          This application uses
+
+
+                        MUI - MagicUserInterface
+
+                (c) Copyright 1993-98 by Stefan Stuntz
+
+
+MUI is a system to generate and maintain graphical user interfaces. With the
+aid  of  a  preferences program, the user of an application has the ability to
+customize the outfit according to his personal taste.
+
+MUI is distributed as shareware. To obtain a complete package containing lots
+of examples and more information about registration please look for a  file
+called  "muiXXusr.lha"  (XX means the latest version number) on your local
+bulletin boards or on public domain disks.
+
+          If you want to register directly, feel free to send
+
+
+                         DM 30.-  or  US$ 20.-
+
+                                  to
+
+                             Stefan Stuntz
+                        Eduard-Spranger-Straße 7
+                             80935 München
+                                GERMANY
+@endnode

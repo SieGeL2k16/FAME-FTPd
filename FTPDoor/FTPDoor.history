@@ -1,0 +1,44 @@
+         Program-History for FTPDoor by Sascha 'SieGeL/tRSi' Pfalz
+-----------------------------------------------------------------------------
+V0.1 Build 85 (24-Apr-2004):
+
+  - Recompiled to have the latest Prefs changings implemented. Nothing
+    else is changed.
+
+
+V0.1 Build 84 (21-Jan-2004):
+
+  - Tried to implement a different way of uploading files, but this does
+    not work as expected. So nothing is changed on this tool, just the
+    Build number is much higher because of my experiments :)
+
+V0.1 Build    (24-Dec-2003):
+
+  - Fixed Versiontag, was showing aCID-tOP instead of FTPWho :)
+
+
+V0.1 Build 47 (29-Nov-2003):
+
+  - Recompiled to support latest preferences changings.
+
+
+V0.1 Build 46 (28-Sep-2003):
+
+  - Recompiled to support latest preferences changings.
+
+
+V0.1 Build 45 (05-Sep-2003):
+
+  - Recompiled to have support for latest structure changings in Build 505+
+    of the FTP Server.
+
+  - Added support for UserNumber 0 slots (during connection phase no user
+    informations are available) and made some changings to the display
+
+
+V0.1 Build 41 (31-Aug-2003):
+
+	- First working Version. Reads the stats file created by the Server and
+    displays a list of currently online users. Has to be added as command
+    FTPWHO.
+-----------------------------------------------------------------------------

@@ -1,0 +1,19 @@
+                    How to upload files using FAME-FTPd
+-----------------------------------------------------------------------------
+As the FAME-FTPd daemon displays only a virtual filesystem, you have to 
+upload your files directly into the conference where the files belong to.
+Please note that you are not allowed to create any directories, and your
+filenames must match the same rules the traditional upload via FAME defines,
+else your files have to be renamed later!
+
+After uploading your files you will see them appearing in the conference
+directories only as long as you leave your connection active, but this of
+course does not mean that your files get removed, only the server simply
+"forgets" all files from you after you logout.
+
+To finalize the upload(s) and get credits you MUST (!) connect directly
+to FAME and you will be prompted with a list of all uploaded files. Sorry
+for this, but no other possibility exists to bring in files from outside
+of FAME.
+
+---------------------------------------------------------------------[EOF]---

@@ -1,0 +1,120 @@
+      Program-History for FAME-FTPdCFG by Sascha 'SieGeL/tRSi' Pfalz
+-----------------------------------------------------------------------------
+
+V0.1 Build 327 (24-Apr-2004):
+
+  - Added Logfile and Maximum Users gadgets. The Logfile will write 
+    a FAME-like logfile.
+    The Maximum Users setting allows to define how many simultaenous
+    users are allowed. Set to 0 to disable.
+
+  - Made code better readable. This is the last version I'm writing,
+    and the release will contain all C-Source so maybe someone else
+    can continue working on this tool.
+
+  - aCID-tOP support is unfinished and will probably not make its way
+    in the public release as I have absolutly no time for these developments
+    anymore. I will release also the C-sources for aCID-tOP and some other
+    tools I've written so that someone else maybe can finish these things.
+
+
+V0.1 Build 317 (24-Jan-2004):
+
+  - Added new option 'aCID-tOP' which will allow my own weektop tool to
+    count the uploads via FTP, even when FAME won't execute the ULSTAT
+    commands itself. This of course works only with my aCID-tOP tool and
+    requires of course also an updated version of aCID-tOP (V1.2).
+
+
+V0.1 Build 312 (21-Jan-2004):
+
+  - Changed layout of options and added new feature called passive port
+    range which allows to define the port range to use for passive 
+    connections. This is useful if you Amiga is behind a firewall and you
+    have only a specific portrange allowed to be accessed. If set to 0
+    the Server do not give port numbers out of the range but instead let
+    the TCP/IP stack decide.
+
+
+V0.1 Build 286 (07-Dec-2003):
+
+  - Enhanced Online-Help for passive IP file to make clear that this file
+    can also contain a hostname, not only IP addresses. The server tries
+    to resolve that IP address before using it.
+
+
+V0.1 Build 284 (29-Nov-2003):
+
+  - Added option for an optional title ascii/ansi file to be displayed
+    before an user enters his login data.
+
+  - Added option to use a different IP address for passive connects. To
+    support this feature a textfile with the desired IP address must be
+    created and given to the IPFile option under pathes.
+
+
+V0.1 Build 271 (28-Sep-2003):
+
+	- Added config option to choose desired Timeout for FTP server. Range
+    goes from 1 - 15 minutes with 10 minutes being the default.
+
+
+V0.1 Build 226 (13-Sep-2003):
+
+  - Added TaskMonitor page to show all active connections (similar to FTPWho)
+
+  - Added new setting to adjust the maximum allowed filename length
+    between 12 - 107 chars
+
+  - Added new setting to adjust the copy buffer for all server-related file
+    copy functions. Can be adjusted between 256k - 1024k
+
+
+V0.1 Build 175 (31-Aug-2003):
+
+  - Recompiled as some base structures have changed
+
+
+V0.1 Build 174 (21-Aug-2003):
+
+  - Added support for context-sensitive help (HELP key). Either put the guide 
+    in the same directory where FAME-FTPdCFG is installed or copy the docs to
+    FAME:Documentation/FAME-FTPd.guide to let it work.
+
+	- Added checkmark for "Resolve Hostnames" option. If disabled, only IP
+    addresses are logged, else host lookup is performed to try to determine
+    the hostname, which is then used for logging.
+
+  - Added "Temporary Upload Path" option to Pathes page. This defines where
+    to put all temporary uploads. You should use RAM: or similar to avoid
+    disc fragmentation.
+
+  - Added preferences check. As the FTP Server is currently under development
+    the Preferences file will change often, to indicate that something has
+    changed the Config Tool will alarm you if your prefs file is outdated.
+    As a general rule one should first start the config tool to check for
+    the prefs file.
+
+
+V0.1 Build 148 (13-Aug-2003):
+
+  - Updated About window with some greetings, specially to bysis for helping
+    me finding that nasty 3-weeks-to-search bug :|
+
+	- Changed window layout to use page registers. This was neccessary as I
+    simply to dumb to create a good looking layout in one register group :(
+    However this design allows a much better overview of all comming options.
+
+	- Added possibility to disable the Debug window on Workbench screen.
+
+  - Made some code improvements, specially Buffer overflows should be now
+    impossible during usage of counting copy routines (i.e. FAMEStrCopy() ).
+
+
+V0.1 Build 75  (03-Aug-2003):
+
+	- First working Version, can read/write preferences. Currently supported
+	  is only the definition of the upload description file that will be
+    included in every conference if you wish to have such file.
+    The prefs file is saved in: FAME:ExternEnv/Doors/FAME-FTPd.cfg
+-----------------------------------------------------------------------------

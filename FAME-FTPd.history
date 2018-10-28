@@ -1,0 +1,175 @@
+        Program-History for FAME-FTPd by Sascha 'SieGeL/tRSi' Pfalz
+-----------------------------------------------------------------------------
+
+V0.1 Build 626 (24-Apr-2004) [PUBLIC RELEASE]:
+
+  - Added maximum simultaneous online user check. If the counter exceeds
+    configured maximum the server rejects further logins. Suggestion by
+    Exon.
+
+  - Changed DebugLog() behavour. If a Logfile is configured in the config
+    tool the DebugLog() writes to that file, else it writes to RAM:ftpd_debug.log.
+    Also if "Use Debug Log" is not activated only important actions are
+    logged, else the FTP Server dumps out nearly all communication with 
+    the client.
+
+V0.1 Build 617 (25-Jan-2004):
+
+  - Added support for aCID-tOP updating. This is done by saving a binary
+    file in FAME:ExternEnv/Doors/FTPd-AT_#CONFID.dat with all required
+    informations to update the WeekTop stats. This file will be used by
+    aCID-tOP V1.1 and allows to count now FTP uploads, too. Suggestion and
+    idea by dIGIMAN.
+
+
+V0.1 Build 598 (22-Jan-2004):
+
+  - Added setsockopt() calls to Data connection sockets with increased
+    RecieveWin Buffers, at least here this increased upload speed by about 10%,
+    plz check out if this is also true for you betatesters. If not I will
+    add some config options so that everyone can tweak these parameters.
+
+
+V0.1 Build 585 (21-Jan-2004):
+
+  - Added Passive Port range support. The server will use the given portrange
+    and rotate all passive ports inside this range. During the fact that 
+    TCP/IP declares a connection to be having 
+    SRC-IP:SRC-PORT | DEST-IP:DEST-PORT
+    there should be no problems with multiply instances running in parallel.
+    To disable this feature simply set both Portlow and -high to 0 to have
+    the TCP stack automatically assigning portnumbers.
+
+  - Passive IPs can be given now in either Hostname or IPaddress format,
+    both is now handled by the server (Hostnames are resolved and resolved
+    ip address is then used for passive replies)
+
+  - Updated some internal codeparts to be more "release-friendly".
+
+
+V0.1 Build 543 (29-Nov-2003):
+
+  - Added support for initial Title ascii display. If a file can be found
+    it will be displayed to the client before the logindata will be asked.
+
+  - Fixed a bug in Passive handling. When an error occures the TCP/IP
+    communication was broken and you had to relogin to fix it. Now fixed.
+
+  - Added possibility to use a different IP address for passive responses.
+    This is required if you are using IP-NAT and your Amiga is not the
+    Router (aka not connected directly to the Internet). See docs for
+    further description.
+
+
+V0.1 Build 531 (28-Sep-2003) [dIGIMAN]:
+
+  - Added configurable timeout. If timeout is reached the server ends
+    the connection and itself resulting in no longer active tasks because
+    of the user not logging out properly.
+
+  - Added last missing FTP command STAT. Now all commands required by
+    RFC 959 are added.
+
+
+V0.1 Build 519 (13-Sep-2003) [dIGIMAN]:
+
+  - Added support for configurable filename size and filebuffer size. 
+
+  - Added more statistic updates for different kinds of actions inside
+    the server.
+
+
+V0.1 Build 515 (09-Sep-2003) [dIGIMAN]:
+
+  - Digiman has investigated into the problems on his system, it seems to 
+    be related to filenames being to long to be handled by the doors...I've
+    added now a limitation to 28 characters (have to add @xx usernumber,too!)
+    so this should now hopefully avoid these problems in the future.
+
+
+V0.1 Build 514 (09-Sep-2003) [dIGIMAN]:
+
+  - Fixed a harmless warning from the server whenever someone tries to login
+    to your server but failed (wrong pw etc.) and disconnected. This requires
+    that you upgrade the FTPDoor.fim tool, too else it won't work in some
+    situations anymore.
+
+  - Added additional checks against FAME User.data. If an user has no access
+    to upload files or the account is marked invalid/inactive inside FAME the
+    server now handles these situations, too. Now all important checks are
+    implemented, it's up to the sysop to decide who can upload and who has
+    access.
+
+  - Added more error checking for uploaded files. Also the upload and download
+    pathes are printed out to the debug log to see if there is any 
+    misconfiguration.
+
+  - Fixed a small bug in the stats file handling which can result in wrong
+    stats when simultanous instances of ftpd are running. This is now hopefully
+    fixed, at least I was not able to reproduce it here anymore.
+
+
+V0.1 Build 495 (31-Aug-2003) [dIGIMAN]:
+
+  - Added statistics system to server. This allows the soon-to-come Fame Door
+    to display some informations about the current work of the FTP Server.
+
+
+V0.1 Build 467 (24-Aug-2003):
+
+  - Added online check from UserEditor, because of a major bug in FAMEConfig
+    System I cannot allow it that an user is logged in both in FAME and the
+    FTP Server at once. This also requires a second tool (FIM) which checks
+    if an user tries to login to FAME AFTER he is logged into the FTP server,
+    in this case the user will be kicked out immediatly. This tool must be 
+    run as one of the first tools before anything else is loaded by FAME.
+    Sorry for that radical behavour, but normally the Configsystem should
+    update user.data in memory/on disc at once, but this is in fact not the
+    case :( Also this FIM door must start the WeekTop door itself, as FAME
+    does not start this tool after processing LostCarrier files...very strange
+    behavour :(((
+
+  - Added last missing command STOR. Upload handling works in the following
+    way: The file will be first uploaded to UL-TEMP-DIR. Next it will be
+    moved to the playpen dir of the conference the file belongs to. Also a
+    file description will be generated so that FAME actually knows what to
+    do with this file. Finally the user has to login into FAME via Modem or
+    Telnet and finish the uploads.
+
+  - Added commands HELP, CLNT & FEAT.
+
+	- Added support for resolving hostnames of connected ip addresses. This
+    can be enabled/disabled with the preferences tool.
+
+  - Changed transfer stats to display only file ul/dl statistics.
+
+  - Added support for new config option "Temporary Upload Path". If not set
+    it will be set to default path RAM:
+
+  - Added better error handling. Instead of silently writing to the debug
+    log, an EasyRequest() is now used for non-recoverable errors, so the
+    SysOp should be notified now in any case whenever something goes wrong.
+
+
+V0.1 Build 291 (13-Aug-2003):
+
+  - Fixed the annoying error message that occured when Total Commander
+    downloads a file from us. This was caused by the wrong order of CRLF
+    send to the control socket. Big thanks to Bysis for helping me finding
+    that bug.
+
+  - Improved Directory loading speed, instead of using a character copying 
+    function now a line-based copying function is used which speeds up 
+    directory loading a lot.
+
+  - Added support for latest preference changes.
+
+
+V0.1 Build 229 (03-Aug-2003):
+
+	- Working version with full authentification against FAME user.data. 
+    Downloading works with some problems that are currently not solved. Some
+    FTP clients seems to have some trouble recognizing EOF on downloads. 
+    Have to further investigate this problems.
+
+-----------------------------------------------------------------------------
